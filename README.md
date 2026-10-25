@@ -10,7 +10,7 @@ scanned pages, in English and Russian.**
 
 **Live demo: [kyan9400.github.io/lumen-search](https://kyan9400.github.io/lumen-search/).** It runs
 entirely in your browser: the same BM25, multilingual-e5-small embeddings and rank fusion as the server,
-over an exported index of 8 public documents (2,342 passages). The full service — FastAPI, FAISS,
+over an exported index of 8 public documents (2,343 passages). The full service — FastAPI, FAISS,
 Redis, OCR on upload and cross-encoder reranking — starts with `docker compose up`.
 
 ![Searching in English and Russian; results cite a page, an article or a spreadsheet row](docs/demo.gif)
@@ -43,15 +43,15 @@ a spreadsheet row, or a phrase — so the labels survive changes to chunking
 | Retrieval | Hit@1 | Hit@5 | Recall@10 | MRR@10 | nDCG@10 | p50 latency |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | BM25 | 54.8% | 67.7% | 73.8% | 0.605 | 0.621 | 3 ms |
-| Dense (multilingual-e5-small + FAISS) | 48.4% | 75.8% | 77.8% | 0.600 | 0.624 | 43 ms |
-| **Hybrid (RRF)** | 56.5% | 75.8% | 79.8% | 0.653 | 0.664 | 44 ms |
-| **Hybrid + rerank** (top 10, mMiniLM cross-encoder) | 62.9% | 83.9% | 79.8% | 0.704 | 0.708 | 0.98 s |
+| Dense (multilingual-e5-small + FAISS) | 48.4% | 75.8% | 77.8% | 0.601 | 0.625 | 41 ms |
+| **Hybrid (RRF)** | 56.5% | 75.8% | 79.8% | 0.650 | 0.662 | 40 ms |
+| **Hybrid + rerank** (top 10, mMiniLM cross-encoder) | 62.9% | 83.9% | 79.8% | 0.704 | 0.707 | 1.0 s |
 
 - Hybrid beats either retriever alone on recall and MRR: BM25 wins on identifiers and exact wording,
   embeddings on paraphrases and Russian word forms.
 - Questions that share words with the answer are nearly solved (hybrid Hit@5 96.8%, 100% reranked).
   Paraphrases are where the cross-encoder earns its cost: Hit@5 rises from 66.7% to 83.3%.
-- Reranking the top 20 instead of the top 10 lifts Recall@10 to 85.9% at 1.8 times the latency.
+- Reranking the top 20 instead of the top 10 lifts Recall@10 to 85.9% at 1.9 times the latency.
 - Cross-lingual questions remain the weak spot (1 of 7 found in the top 5): in a mixed-language corpus,
   e5-small prefers passages in the language of the question.
 
