@@ -109,3 +109,9 @@ def test_pdfium_hyphen_marks_inside_a_line() -> None:
         resolve_pdfium_breaks(line, words)
         == "authentication of look-up secrets in a hardware-protected module"
     )
+    # the right-hand side continues as a compound, so the break was at one of its hyphens
+    assert resolve_pdfium_breaks("a denial\x02of-service attack", words) == "a denial-of-service attack"
+    assert resolve_pdfium_breaks("an out-of\x02band secret", words) == "an out-of-band secret"
+    assert join_broken_word("a denial-", "of-service attack", words) == "a denial-of-service attack"
+    # ...unless the document uses the joined word
+    assert resolve_pdfium_breaks("authen\x02tication-based", words) == "authentication-based"

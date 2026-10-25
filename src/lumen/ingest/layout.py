@@ -44,9 +44,9 @@ class Heading:
 
 _WORD = re.compile(r"[^\W\d_]+(?:-[^\W\d_]+)*")
 _LAST_WORD = re.compile(r"[^\W\d_]+(?:-[^\W\d_]+)*$")
-_FIRST_WORD = re.compile(r"^[^\W\d_]+")
+_FIRST_WORD = re.compile(r"^[^\W\d_]+(?:-[^\W\d_]+)*")
 # PDFium rejoins a word hyphenated across lines itself and marks the hyphen with \x02: "hardware\x02protected"
-_PDFIUM_BREAK = re.compile(r"([^\W\d_]+)\x02([^\W\d_]+)")
+_PDFIUM_BREAK = re.compile(r"([^\W\d_]+(?:-[^\W\d_]+)*)\x02([^\W\d_]+(?:-[^\W\d_]+)*)")
 
 
 def vocabulary(pages: list[list[str]]) -> set[str]:
@@ -77,19 +77,22 @@ def join_broken_word(left: str, right: str, words: set[str] | None) -> str:
     """Join a word split at a line end: "authenti-" + "cation", but "hardware-" + "protected".
 
     A soft hyphen always joins. A hyphen (or PDFium's \x02 mark) joins when the document uses the joined
-    word, and is kept when it uses the hyphenated form, or both halves are words of their own.
+    word, and is kept when either side is part of a compound, the document uses the hyphenated form, or
+    both halves are words of their own.
     """
     head, mark = left[:-1], left[-1]
     if mark in "-\x02" and words:
         before = _LAST_WORD.search(head)
         after = _FIRST_WORD.match(right)
         if before and after:
-            prefix, suffix = before.group().lower(), after.group().lower()
-            last = prefix.rsplit("-", 1)[-1]
-            if last + suffix not in words and (
-                "-" in prefix  # "out-of-" + "band": the break is at one of the compound's hyphens
-                or f"{prefix}-{suffix}" in words
-                or (last in words and suffix in words)
+            prefix, rest = before.group().lower(), after.group().lower()
+            last, first = prefix.rsplit("-", 1)[-1], rest.split("-", 1)[0]
+            if last + first not in words and (
+                # "out-of-" + "band", "denial-" + "of-service": the break is at one of a compound's hyphens
+                "-" in prefix
+                or "-" in rest
+                or f"{last}-{first}" in words
+                or (last in words and first in words)
             ):
                 return f"{head}-{right}"
     return head + right
