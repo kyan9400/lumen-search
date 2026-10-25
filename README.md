@@ -15,6 +15,12 @@ Redis, OCR on upload and cross-encoder reranking — starts with `docker compose
 
 ![Searching in English and Russian; results cite a page, an article or a spreadsheet row](docs/demo.gif)
 
+| A paraphrased question, answered from the NIST guideline with page and section | A Russian query; the best match is in a scanned law read with OCR |
+| --- | --- |
+| ![Hybrid search results with highlights and an extractive answer](docs/screenshots/hybrid-search.png) | ![Russian results from an OCR scan, with OCR confidence](docs/screenshots/russian-and-ocr.png) |
+| **The API with reranking: Article 12 moves from #46 (keyword) to #1** | **A spreadsheet row with the rows around it** |
+| ![Reranked results from the FastAPI service](docs/screenshots/api-reranked.png) | ![Context viewer on an Excel row](docs/screenshots/excel-row-context.png) |
+
 ## What it does
 
 - **Reads real documents.** PDF (born-digital and scanned), Word, Excel and CSV, Markdown, HTML, plain
