@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+dist/
+# the browser model and the static demo are built in CI (scripts/build_demo.py)
+build/
+data/
+data-*/
+.env
+node_modules/

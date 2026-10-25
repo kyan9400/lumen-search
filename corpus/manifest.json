@@ -1,0 +1,83 @@
+{
+  "documents": [
+    {
+      "id": "nist-sp-800-63b-4",
+      "file": "files/nist-sp-800-63b-4.pdf",
+      "title": "NIST SP 800-63B-4: Authentication and Authenticator Management (2025)",
+      "source_url": "https://doi.org/10.6028/NIST.SP.800-63B-4",
+      "download_url": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-63B-4.pdf",
+      "license": "U.S. government work, not subject to copyright in the United States",
+      "ocr": "auto",
+      "sha256": "d9ab89576b5ae2cfb3ba37781110788dea27a85a5079496dbfc1a79834670afd"
+    },
+    {
+      "id": "nist-csf-2-0",
+      "file": "files/nist-csf-2-0.pdf",
+      "title": "NIST Cybersecurity Framework (CSF) 2.0 (2024)",
+      "source_url": "https://doi.org/10.6028/NIST.CSWP.29",
+      "download_url": "https://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.29.pdf",
+      "license": "U.S. government work, not subject to copyright in the United States",
+      "ocr": "auto",
+      "sha256": "3c31f46fee98cac0c4323453e5109291a213b4de7fef8c058af9bf67f717433c"
+    },
+    {
+      "id": "nist-sp-800-53r5-controls",
+      "file": "files/nist-sp-800-53r5-controls.xlsx",
+      "title": "NIST SP 800-53 Rev. 5 control catalog (Excel)",
+      "source_url": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final",
+      "download_url": "https://csrc.nist.gov/files/pubs/sp/800/53/r5/upd1/final/docs/sp800-53r5-control-catalog.xlsx",
+      "license": "U.S. government work, not subject to copyright in the United States",
+      "ocr": "never",
+      "sha256": "1777ed6f839bccd55516e6e703bfe75e3cf63efb2ec80bb9309ed960af2c9ea4"
+    },
+    {
+      "id": "fips-112-password-usage",
+      "file": "files/fips-112-password-usage-1985.pdf",
+      "title": "FIPS PUB 112: Password Usage (1985, scanned)",
+      "source_url": "https://nvlpubs.nist.gov/nistpubs/Legacy/FIPS/fipspub112.pdf",
+      "download_url": "https://nvlpubs.nist.gov/nistpubs/Legacy/FIPS/fipspub112.pdf",
+      "license": "U.S. government work, not subject to copyright in the United States",
+      "ocr": "always",
+      "sha256": "6d0b29518f30ce68d77e6916c6943be517623de1aac77525b54b7ebc4dec20e4"
+    },
+    {
+      "id": "owasp-password-storage",
+      "file": "files/owasp-password-storage-cheat-sheet.md",
+      "title": "OWASP Password Storage Cheat Sheet",
+      "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html",
+      "download_url": "https://raw.githubusercontent.com/OWASP/CheatSheetSeries/master/cheatsheets/Password_Storage_Cheat_Sheet.md",
+      "license": "CC BY-SA 4.0, © OWASP Cheat Sheet Series contributors",
+      "ocr": "never",
+      "sha256": "3869a8bf0a5144ef5c741b74fb3739bf10eb16af669c65a60a233aad943a9323"
+    },
+    {
+      "id": "owasp-authentication",
+      "file": "files/owasp-authentication-cheat-sheet.md",
+      "title": "OWASP Authentication Cheat Sheet",
+      "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html",
+      "download_url": "https://raw.githubusercontent.com/OWASP/CheatSheetSeries/master/cheatsheets/Authentication_Cheat_Sheet.md",
+      "license": "CC BY-SA 4.0, © OWASP Cheat Sheet Series contributors",
+      "ocr": "never",
+      "sha256": "92f7483b28548679917a329c7b9be1824f33e934d9eed670aaf3e9a1e7b37e83"
+    },
+    {
+      "id": "ru-152-fz-personal-data",
+      "file": "files/ru-152-fz-personal-data.docx",
+      "title": "Федеральный закон № 152-ФЗ «О персональных данных» (действующая редакция)",
+      "source_url": "http://pravo.gov.ru/proxy/ips/?docbody=&nd=102108261",
+      "license": "Официальный документ: не является объектом авторских прав (ст. 1259 ГК РФ)",
+      "ocr": "never",
+      "sha256": "ae4f5f4c7c9537fe1d59b81f401ff6b4d7c281978d1e43780c832e4c3c6b69b0"
+    },
+    {
+      "id": "ru-519-fz-2020-amendment",
+      "file": "files/ru-519-fz-2020-scan.pdf",
+      "title": "Федеральный закон от 30.12.2020 № 519-ФЗ о внесении изменений в 152-ФЗ (скан)",
+      "source_url": "http://publication.pravo.gov.ru/Document/View/0001202012300044",
+      "download_url": "http://publication.pravo.gov.ru/file/pdf?eoNumber=0001202012300044",
+      "license": "Официальный документ: не является объектом авторских прав (ст. 1259 ГК РФ)",
+      "ocr": "auto",
+      "sha256": "0671dccecbba0f74c98ff2f4e6269e1bc2ebf219d6800374e8f4d06867d7b745"
+    }
+  ]
+}

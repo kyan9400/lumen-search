@@ -1,0 +1,12 @@
+{
+  "name": "lumen-search-demo",
+  "private": true,
+  "description": "Browser side of the static demo: vendored libraries and JavaScript tests.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/js/"
+  },
+  "devDependencies": {
+    "@huggingface/transformers": "3.7.6"
+  }
+}

@@ -1,0 +1,39 @@
+# docker compose up --build   →   http://localhost:8000 (UI) and http://localhost:8000/docs (API)
+# The first start indexes the demo corpus in corpus/ (about two minutes, most of it OCR).
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      LUMEN_REDIS_URL: redis://redis:6379/0
+      LUMEN_BOOTSTRAP_MANIFEST: /app/corpus/manifest.json
+      # second stage: a multilingual cross-encoder reorders the top 10 (baked into the image)
+      LUMEN_RERANKER_MODEL: cross-encoder/mmarco-mMiniLMv2-L12-H384-v1
+      # enables POST /api/documents and DELETE; send it as the X-API-Key header
+      LUMEN_API_KEY: ${LUMEN_API_KEY:-change-me}
+      # optional generated answers, e.g. Ollama on the host:
+      # LUMEN_LLM_BASE_URL: http://host.docker.internal:11434/v1
+      # LUMEN_LLM_MODEL: qwen2.5:7b-instruct
+    volumes:
+      - lumen-data:/data
+    depends_on:
+      redis:
+        condition: service_healthy
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+
+  redis:
+    image: redis:7.4-alpine
+    command: ["redis-server", "--maxmemory", "128mb", "--maxmemory-policy", "allkeys-lru", "--save", ""]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  lumen-data:

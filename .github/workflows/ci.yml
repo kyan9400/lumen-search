@@ -1,0 +1,87 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  TORCH_INDEX: https://download.pytorch.org/whl/cpu
+
+jobs:
+  lint:
+    name: Lint and types
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install torch --index-url "$TORCH_INDEX" && pip install -e ".[dev,demo]"
+      - run: ruff check .
+      - run: ruff format --check .
+      - run: mypy
+
+  test:
+    name: Tests (Python ${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "22"
+      - name: Install Tesseract (English and Russian)
+        run: sudo apt-get update -q && sudo apt-get install -y -q tesseract-ocr tesseract-ocr-eng tesseract-ocr-rus
+      - run: pip install torch --index-url "$TORCH_INDEX" && pip install -e ".[dev]"
+      - name: Unit, API, OCR and JavaScript parity tests
+        run: pytest --cov --cov-report=term-missing:skip-covered
+      - name: Corpus files match their recorded checksums
+        run: python corpus/scripts/fetch.py --verify
+
+  docker:
+    name: Docker image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+      - uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        with:
+          context: .
+          load: true
+          tags: lumen-search:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Smoke test: upload a scanned PDF, OCR it, search it, hit the Redis cache
+        run: |
+          docker network create lumen
+          docker run -d --name redis --network lumen redis:7.4-alpine
+          docker run -d --name api --network lumen -p 8000:8000 \
+            -e LUMEN_REDIS_URL=redis://redis:6379/0 -e LUMEN_API_KEY=ci-key lumen-search:ci
+          for i in $(seq 60); do curl -fs localhost:8000/api/health && break; sleep 2; done
+          curl -fs -X POST localhost:8000/api/documents -H "X-API-Key: ci-key" \
+            -F "file=@corpus/files/ru-519-fz-2020-scan.pdf" -F "title=519-FZ scan" | tee upload.json
+          python3 -c "import json; d = json.load(open('upload.json')); assert d['created'] and len(d['ocr_pages']) == 8, d"
+          query='q=%D1%80%D0%B0%D1%81%D0%BF%D1%80%D0%BE%D1%81%D1%82%D1%80%D0%B0%D0%BD%D0%B5%D0%BD%D0%B8%D0%B5&k=3'
+          curl -fs "localhost:8000/api/search?$query" | tee first.json
+          curl -fs "localhost:8000/api/search?$query" | tee second.json
+          python3 -c "import json; a = json.load(open('first.json')); b = json.load(open('second.json')); assert a['hits'] and not a['cached'] and b['cached'], (a, b)"
+          curl -fs localhost:8000/api/health | python3 -c "import json, sys; h = json.load(sys.stdin); assert h['cache'] == 'redis' and h['cache_ok'] and h['ocr'], h"
+      - if: failure()
+        run: docker logs api

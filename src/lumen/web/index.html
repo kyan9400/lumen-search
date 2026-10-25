@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lumen Search</title>
+  <meta name="description" content="Hybrid document search with citations: BM25 and multilingual embeddings over PDF, Word, Excel and scanned pages, in English and Russian.">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <a class="skip" href="#results">Skip to results</a>
+  <header class="top">
+    <a class="brand" href="./" aria-label="Lumen Search home">
+      <svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="6.5"/><path d="M16 2.5v4M16 25.5v4M2.5 16h4M25.5 16h4M6.4 6.4l2.9 2.9M22.7 22.7l2.9 2.9M6.4 25.6l2.9-2.9M22.7 9.3l2.9-2.9"/></svg>
+      <span>Lumen</span>
+    </a>
+    <p class="tagline">Hybrid document search with citations</p>
+    <nav class="top-links" aria-label="Links">
+      <a id="api-link" href="docs" hidden>API docs</a>
+      <a href="https://github.com/kyan9400/lumen-search" rel="noopener">GitHub</a>
+      <button type="button" id="theme" class="icon-button" aria-label="Switch light or dark theme">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg>
+      </button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="search-panel" aria-label="Search">
+      <form id="search-form" role="search">
+        <label class="visually-hidden" for="q">Search the documents</label>
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg>
+          <input id="q" name="q" type="search" autocomplete="off" spellcheck="false" maxlength="500"
+                 placeholder="Ask about passwords, authentication or personal data… (English or Russian)">
+          <button type="submit" class="primary">Search</button>
+        </div>
+      </form>
+      <div class="controls">
+        <div class="segmented" role="radiogroup" aria-label="Retrieval mode">
+          <button type="button" role="radio" data-mode="hybrid" aria-checked="true" title="BM25 and embeddings, fused with reciprocal rank fusion">Hybrid</button>
+          <button type="button" role="radio" data-mode="bm25" aria-checked="false" title="BM25 over stemmed words">Keyword</button>
+          <button type="button" role="radio" data-mode="dense" aria-checked="false" title="multilingual-e5-small embeddings">Semantic</button>
+        </div>
+        <div class="segmented" role="radiogroup" aria-label="Language">
+          <button type="button" role="radio" data-lang="" aria-checked="true">All</button>
+          <button type="button" role="radio" data-lang="en" aria-checked="false">EN</button>
+          <button type="button" role="radio" data-lang="ru" aria-checked="false">RU</button>
+        </div>
+        <label class="visually-hidden" for="doc">Document</label>
+        <select id="doc"><option value="">All documents</option></select>
+        <label id="rerank-toggle" class="toggle" hidden title="Reorder the top results with a multilingual cross-encoder">
+          <input type="checkbox" id="rerank" checked> Rerank
+        </label>
+        <button type="button" id="model-status" class="pill" hidden></button>
+      </div>
+      <div class="examples-row"><span>Try</span><div id="examples" class="examples"></div></div>
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+    </section>
+
+    <div class="layout">
+      <section id="results" class="results" aria-label="Results"></section>
+      <aside class="side">
+        <section id="answer" class="card answer" aria-live="polite" hidden></section>
+        <section class="card">
+          <h2>Corpus</h2>
+          <ul id="corpus-list" class="corpus"></ul>
+        </section>
+        <section class="card how">
+          <h2>How it works</h2>
+          <p id="engine-line" class="engine-line"></p>
+          <ol>
+            <li><strong>Parse</strong> PDF, Word, Excel, Markdown and HTML; scanned pages go through Tesseract OCR.</li>
+            <li><strong>Chunk</strong> by section and spreadsheet row, so each result cites a page, article or row.</li>
+            <li><strong>Retrieve</strong> with BM25 over Snowball stems and with multilingual-e5 embeddings in FAISS.</li>
+            <li><strong>Fuse</strong> both rankings with reciprocal rank fusion; optionally rerank with a cross-encoder.</li>
+          </ol>
+          <p id="demo-note" class="note" hidden>This is the static demo on GitHub Pages: the same BM25, embeddings and
+            fusion run in your browser over an exported index. The full service (FastAPI, FAISS, Redis, OCR on upload,
+            reranking) runs with Docker — see the <a href="https://github.com/kyan9400/lumen-search#quick-start">README</a>.</p>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="bottom">
+    <p>Documents: NIST publications and FIPS 112 (U.S. government works), OWASP Cheat Sheets (CC BY-SA 4.0),
+      Federal Law No. 152-FZ and No. 519-FZ (official documents, not subject to copyright).
+      Code: MIT, by <a href="https://github.com/kyan9400">Alhassan Alfarran</a>.</p>
+  </footer>
+
+  <dialog id="viewer" aria-labelledby="viewer-title">
+    <header>
+      <div><h2 id="viewer-title"></h2><p id="viewer-where" class="where"></p></div>
+      <button type="button" id="viewer-close" class="icon-button" aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </header>
+    <div id="viewer-body" class="viewer-body"></div>
+    <footer id="viewer-open"></footer>
+  </dialog>
+</body>
+</html>

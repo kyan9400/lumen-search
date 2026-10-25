@@ -1,0 +1,5 @@
+* text=auto eol=lf
+# corpus files are checked against SHA-256 sums: never convert their line endings
+corpus/files/** -text
+*.png binary
+*.gif binary
