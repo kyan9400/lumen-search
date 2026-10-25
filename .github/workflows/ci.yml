@@ -68,7 +68,7 @@ jobs:
           tags: lumen-search:ci
           cache-from: type=gha
           cache-to: type=gha,mode=max
-      - name: Smoke test: upload a scanned PDF, OCR it, search it, hit the Redis cache
+      - name: "Smoke test: upload a scanned PDF, OCR it, search it, hit the Redis cache"
         run: |
           docker network create lumen
           docker run -d --name redis --network lumen redis:7.4-alpine
